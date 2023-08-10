@@ -52,20 +52,37 @@ const getMyPlaylist = async (req, res) => {
 
     const playlist = await Playlist.find({ user: user, type: 'private' })
     if (!playlist) {
-        throw new CustomError.NotFoundError(`No playlist Found `)
+        throw new CustomError.NotFoundError(
+            `No playlist Found with user ${req.user.name} `
+        )
     }
 
     res.status(200).json(playlist)
 }
 
 const getMyPublicPlayList = async (req, res) => {
-    const playlist = await Playlist.find({ type: 'public' })
+    const playlist = await Playlist.find({
+        user: req.user.userId,
+        type: 'public',
+    })
 
     if (!playlist) {
-        throw new CustomError.NotFoundError(`No public playlist present`)
+        throw new CustomError.NotFoundError(
+            `No public playlist is found with name ${req.user.name}`
+        )
     }
 
     res.status(200).json(playlist)
+}
+
+const getAllpublicPlaylist = async (req, res) => {
+    const playlist = await Playlist.find({ type: 'public' })
+
+    if (!playlist) {
+        throw new CustomError.BadRequestError(`No public playlist found`)
+    }
+
+    res.status(200).json({ playlist })
 }
 
 const addToplayList = async (req, res) => {
@@ -87,11 +104,11 @@ const addToplayList = async (req, res) => {
         if (!data) {
             throw new CustomError.BadRequestError('something went wrong')
         }
-        const playlist = await Playlist.findOne({ name: name })
+        const playlist = await Playlist.findOne({ name: name, user: user })
 
         if (!playlist) {
             throw new CustomError.NotFoundError(
-                `no playlist found with name ${name}`
+                `no playlist found with name ${name} with user ${req.user.name}`
             )
         }
 
@@ -122,17 +139,16 @@ const addToplayList = async (req, res) => {
 
 const deletePlayList = async (req, res) => {
     const user = req.user.userId
-    const { imdbID, name } = req.query
+    const { name } = req.query
 
     const playlist = await Playlist.findOneAndDelete({
         user: user,
-        imdbID: imdbID,
         name: name,
     })
 
     if (!playlist) {
         throw new CustomError.NotFoundError(
-            `no playlist found with name ${imdbID}`
+            `no playlist found with name ${name}`
         )
     }
 
@@ -151,6 +167,7 @@ const findTheplayList = async (req, res) => {
 
     res.status(200).json(playlist)
 }
+
 module.exports = {
     createplayList,
     getMyPlaylist,
@@ -158,4 +175,5 @@ module.exports = {
     addToplayList,
     getMyPublicPlayList,
     findTheplayList,
+    getAllpublicPlaylist,
 }

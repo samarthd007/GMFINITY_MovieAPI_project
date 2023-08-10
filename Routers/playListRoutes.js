@@ -5,6 +5,7 @@ const {
     addToplayList,
     getMyPublicPlayList,
     findTheplayList,
+    getAllpublicPlaylist,
 } = require('../Controller/playlistController')
 
 const express = require('express')
@@ -17,7 +18,9 @@ router
     .post(authenticateUser, createplayList)
     .delete(authenticateUser, deletePlayList)
 
-router.route('/public').get(authenticateUser, getMyPublicPlayList)
+router.route('/mypublic').get(authenticateUser, getMyPublicPlayList)
+
+router.route('/public').get(authenticateUser, getAllpublicPlaylist)
 
 router.route('/add').post(authenticateUser, addToplayList)
 

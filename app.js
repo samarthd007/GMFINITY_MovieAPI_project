@@ -8,12 +8,14 @@ const app = express()
 const axios = require('axios')
 const body_parser = require('body-parser')
 const cookieParser = require('cookie-parser')
+const cors = require('cors')
 
 //config
 app.use(express.json())
 app.use(body_parser.json())
 app.use(cookieParser(process.env.JWT_SECRET))
 app.use(morgon('tiny'))
+app.use(cors())
 
 //routes
 app.get('/', async (req, res) => {
